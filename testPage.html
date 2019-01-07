@@ -1,0 +1,133 @@
+<html>
+<head>
+    <!-- <script language="javascript" type="text/javascript" src="jquery-3.3.1.min.js"></script> -->
+     <!-- <script src="jquery-3.3.1.min.js"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script> 
+<script src="turnTracker.js"></script> 
+
+<link rel="stylesheet" href="monsterStatBlock.css">
+
+
+</head>
+
+<body>
+	 <body onload="displayStartMenu()"> 
+	<div class="column" style="background-color: DarkGrey; height: 100%" >
+		<div id="startMenuDiv">
+			
+		</div>
+		<div id="turnOrderList" style="width:100%;">&nbsp</div>
+	</div>
+
+
+	<div class="column" style="background-color: Silver;height: 100%">
+		<div id="inspectActorDiv"></div>
+		<!-- <h2 id="inspectActorName">Actor Name</h2>
+		<h2 id="inspectActorClass">Actor Class</h2>
+		<h2 id="inspectActorHP">Actor HP</h2>
+		<h2 id="inspectActorAC">Actor AC</h2>
+		<h2 id="inspectActorMS">Actor MS</h2>
+		<h2 id="inspectActorConditions">Actor Conditions</h2>
+		<div id="inspectActorConditions">&nbsp</div>
+		<h2 id="inspectActorNotes">Actor Notes</h2>
+		<div id="inspectActorNotes">&nbsp</div> -->
+
+
+
+
+	</div>
+
+
+
+	<div class="column" style="background-color: LightGray;height: 100%">&nbsp</div>
+	<div class="column" style="background-color: Gainsboro;height: 100%">
+
+<div class="stat-block">
+	<hr class="orange-border" />
+	<div class="section-left">
+		<div class="creature-heading">
+			<h1 id="statBlockMonsterName">&nbsp</h1>
+			<h2 id="statBlockMonsterType">&nbsp</h2>
+		</div> <!-- creature heading -->
+		<svg height="5" width="100%" class="tapered-rule">
+	    <polyline points="0,0 400,2.5 0,5"></polyline>
+	  </svg>
+		<div class="top-stats">
+			<div class="property-line first">
+				<h4>Armor Class</h4>
+				<p id="statBlockMonsterAC">&nbsp</p>
+			</div> <!-- property line -->
+			<div class="property-line">
+				<h4 >Hit Points</h4>
+				<p id="statBlockMonsterHP">&nbsp</p>
+			</div> <!-- property line -->
+			<div class="property-line last">
+				<h4 >Speed</h4>
+				<p id="statBlockMonsterSpeed">&nbsp</p>
+			</div> <!-- property line -->
+			<svg height="5" width="100%" class="tapered-rule">
+	    <polyline points="0,0 400,2.5 0,5"></polyline>
+	  </svg>
+			<div class="abilities">
+				<div class="ability-strength">
+					<h4>STR</h4>
+					<p id="statBlockMonsterSTR">&nbsp</p>
+				</div> <!-- ability strength -->
+				<div class="ability-dexterity">
+					<h4 >DEX</h4>
+					<p id="statBlockMonsterDEX">&nbsp</p>
+				</div> <!-- ability dexterity -->
+				<div class="ability-constitution">
+					<h4 >CON</h4>
+					<p id="statBlockMonsterCON">&nbsp</p>
+				</div> <!-- ability constitution -->
+				<div class="ability-intelligence">
+					<h4 >INT</h4>
+					<p id="statBlockMonsterINT">&nbsp</p>
+				</div> <!-- ability intelligence -->
+				<div class="ability-wisdom">
+					<h4 >WIS</h4>
+					<p id="statBlockMonsterWIS">&nbsp</p>
+				</div> <!-- ability wisdom -->
+				<div class="ability-charisma">
+					<h4 >CHA</h4>
+					<p id="statBlockMonsterCHA">&nbsp</p>
+				</div> <!-- ability charisma -->
+			</div> <!-- abilities -->
+			<svg height="5" width="100%" class="tapered-rule">
+	    <polyline points="0,0 400,2.5 0,5"></polyline>
+	  </svg>
+	  <div id="statBlockMonsterProperties" ></div>
+
+		<svg height="5" width="100%" class="tapered-rule">
+		<polyline points="0,0 400,2.5 0,5"></polyline>
+	</svg>
+		<div id="statBlockMonsterAbilities"></div>
+
+		<div id="statBlockMonsterActions"></div>
+
+		<div id="statBlockMonsterLegendaryActions"></div>
+
+
+	<hr class="orange-border bottom" />
+</div> <!-- stat block -->
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
