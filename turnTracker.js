@@ -182,29 +182,6 @@ function confirmActor(actorNum) {
 	radioSel = radioElement.id
 
 	radioSel = radioSel.substring(1)
-	console.log(radioSel)
-
-	// if radio == player || if radio == monster
-		// Create new actor with input name and load player / monster data
-		// set inspect data to loaded data
-		// Save actor
-
-	// Else radio == actor
-		// if radio value == new
-			// Create new actor with input name
-			// Save actor
-
-		// else radio value == load
-			// Load most recent actor from actor table
-
-	// var queryString = 'SELECT * FROM dnd_testDB.'+radioSel+'Data WHERE actorName = "'+actorToConfirm +'"'
-
-
-
-
-
-	console.log(currentTurnorderID)
-
 
 	// If load actor, load most recent actor with same name from actorData
 	if (radioSel == "actor" && radioElement.value == "load") {
@@ -223,18 +200,7 @@ function confirmActor(actorNum) {
 			+"SELECT * FROM dnd_testDB.actorData "
 		 	+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
 			+"END;"
-		// var queryString = "BEGIN NOT ATOMIC "
-		// 	+"INSERT INTO dnd_testDB.actorData"
-		// 	+"(actorName, class, armorClass, currentHitPoints, maxHitPoints, speed, conditions, notes, inventory) "
-		// 	+"SELECT actorName, class, armorClass, currentHitPoints, maxHitPoints, speed, conditions, notes, inventory "
-		// 	+"FROM dnd_testDB.actorData "
-		// 	+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData WHERE actorName = '"+actorToConfirm+"' );"
-		// 	+"SELECT * FROM dnd_testDB.actorData "
-		// 	+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
-		// 	+"END;"
-		// var queryString = 'SELECT * FROM dnd_testDB.'+radioSel
-		// 	+'Data WHERE actorName = "'+actorToConfirm +'"'
-		// 	+' ORDER BY turnorderID DESC LIMIT 1'
+		
 		var sendData={
 			queryString : queryString,
 			returnFunction: displayActorName,
@@ -247,69 +213,43 @@ function confirmActor(actorNum) {
 		// If no name inputed set to unnammed
 		if(actorToConfirm == ""){
 			displayActorName([{actorName:"unnamed"}], {actorNum:actorNum, radioSel:radioSel})
-			createNewActor("unnamed")
+			createNewActor("unnamed",actorNum)
 		}
 		else{
 			displayActorName([{actorName:actorToConfirm}], {actorNum:actorNum, radioSel:radioSel})
-			createNewActor(actorToConfirm)	
+			createNewActor(actorToConfirm,actorNum)	
 		}
 		// createInspectElements(null, {actorDB:radioSel, actorNum:actorNum})
 	}
-
-
-
-
-
-
-	// console.log(queryString)
-
-	// if (loadOption == true) {
-	// 	var sendData={
-	// 		queryString : queryString,
-	// 		returnFunction: displayActorName,
-	// 		returnArgs: {actorNum,radioSel},
-	// 	}
-	// 	queryDatabase(sendData)
-	// }
-	// else{
-	// 	createInspectElements(null, {actorDB:radioSel, actorNum:actorNum})
-	// 	if(actorToConfirm == ""){
-	// 		let actorData = [{actorName:"unnamed"}]
-	// 		let returnArgs = {actorNum:actorNum, radioSel:radioSel}
-	// 		displayActorName(actorData, returnArgs)
-	// 		createNewActor("unnamed")
-	// 	}
-	// 	else{
-	// 		createNewActor(actorToConfirm)	
-	// 	}
-		
-	// }
 }
 
-function createNewActor(actorName, actorData){
+function createNewActor(actorName, actorNum, actorData){
+console.log("CREATENEWACTOR")
+console.log(actorName)
+console.log(actorNum)
+console.log(actorData)
+
+
 	if (actorData == null) {
-		var queryString = "INSERT INTO dnd_testDB.actorData"
+		var queryString = "BEGIN NOT ATOMIC "
+			+"INSERT INTO dnd_testDB.actorData"
 			+"(actorName, turnorderID)"
 			+"VALUES('"+actorName+"','"+currentTurnorderID+"');"
+			+"SELECT * FROM dnd_testDB.actorData "
+			+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
+			+"END"
 	}
 	else{
 		var queryString = "INSERT INTO dnd_testDB.actorData"
 			+"(actorName, class, armorClass, currentHitPoints, maxHitPoints, speed, conditions, notes, inventory, turnorderID)"
 			+"VALUES('"+actorName+"','"+currentTurnorderID+"');"
-	
-
-		VALUES('ghjkgfhjgfhjgfhj', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '189');
-
 	}
-	
-	
 	var sendData={
 		queryString:  queryString,
-		returnFunction: null,
-		returnArgs: null
+		returnFunction: displayActorName,
+		returnArgs: {actorNum:actorNum}
 	}
 	queryDatabase(sendData)
-
 }
 
 
@@ -320,15 +260,25 @@ function createInspectElements(actorData, returnArgs) {
 	try{var actorData = actorData[0]}
 	catch(e){errorLog.push(e)}
 
+	console.log("CreatreInspectElement Actor Data")
+	console.log(actorData)
+
 	var inspectDiv = document.getElementById("inspectActorDiv")
 	clearDIV(inspectDiv)
-	var inspectActorDB = document.createElement("div")
-	inspectActorDB.setAttribute("id","inspectActorDB")
-	inspectActorDB.setAttribute("style","  display: none;")
-	inspectActorDB.setAttribute("title",returnArgs.actorDB)
-	inspectDiv.appendChild(inspectActorDB)
-	
 
+	var inspectActorData = document.createElement("div")
+	inspectActorData.setAttribute("id","inspectActorData")
+	inspectActorData.setAttribute("style","  display: none;")
+	
+	var inspectActorDB = document.createAttribute("actorDB")
+	inspectActorDB.value = returnArgs.actorDB
+	inspectActorData.setAttributeNode(inspectActorDB)
+	
+	var inspectActorID = document.createAttribute("actorID")
+	inspectActorID.value = actorData.actorID
+	inspectActorData.setAttributeNode(inspectActorID)
+
+	inspectDiv.appendChild(inspectActorData)
 
 	var inspectTable = document.createElement("table")
 	inspectTable.setAttribute("id","inspectTable")
@@ -496,20 +446,6 @@ function createInspectElements(actorData, returnArgs) {
 
 
 function updateActorDB(actorNum, actorDB) {
-	// var actorData = {
-	// 	actorName: document.getElementById("actorNameElement").innerHTML,
-	// 	class: document.getElementById("classDataElement").innerHTML,
-	// 	currentHitPoints: document.getElementById("hpDataCurrentElement").innerHTML,
-	// 	maxHitPoints:document.getElementById("hpDataMaxElement").innerHTML,
-	// 	armorClass: document.getElementById("acDataElement").innerHTML,
-	// 	speed: document.getElementById("speedDataElement").innerHTML,
-	// 	conditions: document.getElementById("conditionsDataElement").innerHTML,
-	// 	notes: document.getElementById("notesDataElement").innerHTML,
-	// 	dbName: document.getElementById("inspectActorDB").title,
-	// 	turnorderID: currentTurnorderID,
-	// }
-	// console.log(actorData)
-
 	var newActorName = document.getElementById("actorNameElement").innerHTML
 	queryString = 
 	"BEGIN NOT ATOMIC "
@@ -523,11 +459,11 @@ function updateActorDB(actorNum, actorDB) {
 	+"conditions='"+document.getElementById("conditionsDataElement").innerHTML+"',"
 	+"notes='"+document.getElementById("notesDataElement").innerHTML+"',"
 	+"inventory='"+document.getElementById("inventoryDataElement").innerHTML+"'"
-	+"WHERE actorID='"+document.getElementById(actorNum+"actorName").value+"'"
+	+"WHERE actorID='"+document.getElementById("inspectActorData").attributes.actorID.value+"'"
 	+"AND turnorderID='"+currentTurnorderID+"';"
 
 	+"SELECT * FROM dnd_testDB.actorData "
-	+"WHERE actorID='"+document.getElementById(actorNum+"actorName").value+"'"
+	+"WHERE actorID='"+document.getElementById("inspectActorData").attributes.actorID.value+"'"
 	+"AND turnorderID='"+currentTurnorderID+"';"
 	+"END;"
 
@@ -545,11 +481,16 @@ function updateActorDB(actorNum, actorDB) {
 }
 
 function printResponse(response, args) {
+	console.log("printResponse")
 	console.log(response)
+	console.log(args)
+
 }
 
 
 function displayActorName(actorData, returnArgs) {
+	console.log("displayActorName")
+	console.log(actorData)
 	if (actorData.length == 0) {
 		alert("No actor found")
 		return
@@ -564,9 +505,11 @@ function displayActorName(actorData, returnArgs) {
 
 	displayActorData = actorData
 	displayArgs = returnArgs
+	console.log("DISPLAYACTORNAME")
 	console.log(actorData)
-	console.log(returnArgs.actorNum)
+		console.log(returnArgs)
 	var actorToClear = document.getElementById(returnArgs.actorNum+"idNum")
+	
 	clearDIV(actorToClear)
 
 	var displayRow = document.createElement("tr")
