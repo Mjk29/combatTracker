@@ -176,12 +176,9 @@ function addActor() {
 
 function confirmActor(actorNum) {
 	var actorToConfirm = document.getElementById(actorNum+"input").value
-	// var loadOption = document.getElementById(actorNum+"loadOption").checked
-	// var radioSel = document.querySelector('input[name="'+actorNum+'loadDatabase"]:checked').id;
-	radioElement = document.querySelector('input[name="'+actorNum+'loadDatabase"]:checked');
-	radioSel = radioElement.id
-
-	radioSel = radioSel.substring(1)
+	var radioElement = document.querySelector('input[name="'+actorNum+'loadDatabase"]:checked');
+	var radioSel = radioElement.id
+		radioSel = radioSel.substring(1)
 
 	// If load actor, load most recent actor with same name from actorData
 	if (radioSel == "actor" && radioElement.value == "load") {
@@ -219,8 +216,41 @@ function confirmActor(actorNum) {
 			displayActorName([{actorName:actorToConfirm}], {actorNum:actorNum, radioSel:radioSel})
 			createNewActor(actorToConfirm,actorNum)	
 		}
-		// createInspectElements(null, {actorDB:radioSel, actorNum:actorNum})
 	}
+	else if (radioSel == "monster" || radioSel == "player") {
+		var queryString = "BEGIN NOT ATOMIC "
+		+"CREATE TEMPORARY TABLE dnd_testDB.temporary_table AS SELECT * FROM dnd_testDB.actorData WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData );"
+
+		+"UPDATE dnd_testDB.temporary_table SET actorID = actorID+1;"
+		+"UPDATE dnd_testDB.temporary_table SET class = '"+actorToConfirm+"';"
+		+"UPDATE dnd_testDB.temporary_table SET actorName = '"+actorToConfirm+"';"
+		+"UPDATE dnd_testDB.temporary_table SET turnorderID = '"+currentTurnorderID+"';"
+		+"UPDATE dnd_testDB.temporary_table SET timestamp = NOW();"
+
+		+"UPDATE dnd_testDB.temporary_table tmp "
+		    +"LEFT OUTER JOIN dnd_testDB."+radioSel+"Data table2 "
+		    +"ON tmp.class = table2.actorName "
+		    +"SET tmp.speed = table2.speed, "
+		    	+"tmp.armorClass = table2.armorClass, "
+		    	+"tmp.currentHitPoints = table2.maxHitPoints, "
+		    	+"tmp.maxHitPoints = table2.maxHitPoints "
+		    	if (radioSel == "player") {
+		    		queryString +=", tmp.notes = table2.notes, "
+		    					+"tmp.conditions = table2.conditions "
+		    	}
+		   queryString += "WHERE table2.actorName = tmp.class;"
+		   
+		+"INSERT INTO dnd_testDB.actorData SELECT * FROM dnd_testDB.temporary_table;"
+
+		+"END;"
+
+		console.log(queryString)
+
+
+
+	}
+
+
 }
 
 function createNewActor(actorName, actorNum, actorData){
