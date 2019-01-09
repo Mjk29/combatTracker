@@ -197,13 +197,6 @@ function confirmActor(actorNum) {
 			+"SELECT * FROM dnd_testDB.actorData "
 		 	+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
 			+"END;"
-		
-		var sendData={
-			queryString : queryString,
-			returnFunction: displayActorName,
-			returnArgs: {actorNum,radioSel},
-		}
-		queryDatabase(sendData)
 	}
 
 	else if (radioSel == "actor" && radioElement.value == "new") {
@@ -226,6 +219,8 @@ function confirmActor(actorNum) {
 		+"UPDATE dnd_testDB.temporary_table SET actorName = '"+actorToConfirm+"';"
 		+"UPDATE dnd_testDB.temporary_table SET turnorderID = '"+currentTurnorderID+"';"
 		+"UPDATE dnd_testDB.temporary_table SET timestamp = NOW();"
+		+"UPDATE dnd_testDB.temporary_table SET conditions = NULL;"
+		+"UPDATE dnd_testDB.temporary_table SET notes = NULL;"
 
 		+"UPDATE dnd_testDB.temporary_table tmp "
 		    +"LEFT OUTER JOIN dnd_testDB."+radioSel+"Data table2 "
@@ -239,16 +234,20 @@ function confirmActor(actorNum) {
 		    					+"tmp.conditions = table2.conditions "
 		    	}
 		   queryString += "WHERE table2.actorName = tmp.class;"
-		   
+
 		+"INSERT INTO dnd_testDB.actorData SELECT * FROM dnd_testDB.temporary_table;"
 
+		+"SELECT * FROM dnd_testDB.actorData "
+		 +"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
+
 		+"END;"
-
-		console.log(queryString)
-
-
-
 	}
+	var sendData={
+			queryString : queryString,
+			returnFunction: displayActorName,
+			returnArgs: {actorNum,radioSel},
+		}
+	queryDatabase(sendData)
 
 
 }
