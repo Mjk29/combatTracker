@@ -74,11 +74,23 @@ function setupTurnOrderID(returnData, arg) {
 	console.log("SETTING UP TURN ORDER ID"+currentTurnorderID)
 }
 
+function actorTableDrag(){
+	$("#startMenuTable").find("table:even").addClass("even");
+	$("#startMenuTable").find("table:odd").addClass("odd");
+	$("#startMenuTable").tableDnD({
+	onDragClass: "myDragClass",
+		onDrop: function(table, row) {
+			$("#startMenuTable").find("table").removeClass("even odd");
+			$("#startMenuTable").find("table:even").addClass("even");
+			$("#startMenuTable").find("table:odd").addClass("odd");
+		}
+	});
+}
 
 var actorCount = 0
 function addActor() {
 	var turnOrderList = document.getElementById("turnOrderList")
-
+	var newTableFlag = false
 	if (document.getElementById('startMenuTable') == null) {
 		console.log("Creating table")
 		var turnOrderTable = document.createElement("table")
@@ -86,13 +98,17 @@ function addActor() {
 		turnOrderTable.setAttribute("border", "1")
 		turnOrderTable.setAttribute("id", "startMenuTable")
 		turnOrderList.appendChild(turnOrderTable)
+		newTableFlag = true
 	}
 	else{
 		turnOrderTable = document.getElementById('startMenuTable')
 	}
-	
+
 	let newActor = document.createElement("tr")
 	newActor.setAttribute("id",actorCount+"idNum")
+
+	let newActorTD = document.createElement("td")
+	let newActorTable = document.createElement("table")
 
 	let topRow = document.createElement("tr")
 	let bottomRow = document.createElement("tr")
@@ -118,7 +134,7 @@ function addActor() {
 
 	topRow.appendChild(actorNameNodeCell)
 	topRow.appendChild(actorNameBtnCell)
-	newActor.appendChild(topRow)
+	newActorTable.appendChild(topRow)
 
 	let actorPlayerCell = document.createElement("td")
 	actorPlayerCell.setAttribute("style", "width:25%")
@@ -168,10 +184,14 @@ function addActor() {
 	actorLoadActorCell.appendChild(actorLoadActorCheckboxLabel)
 	bottomRow.appendChild(actorLoadActorCell)
 
-	newActor.appendChild(bottomRow)
+	newActorTable.appendChild(bottomRow)
+	newActorTD.appendChild(newActorTable)
+	newActor.appendChild(newActorTD)
 
 	actorCount+=1
 	turnOrderTable.appendChild(newActor)
+	actorTableDrag()
+
 }
 
 function confirmActor(actorNum) {
@@ -195,7 +215,7 @@ function confirmActor(actorNum) {
 			+"SELECT * FROM dnd_testDB.temporary_table;"
 
 			+"SELECT * FROM dnd_testDB.actorData "
-		 	+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
+			+"WHERE actorID =( SELECT MAX(actorID) FROM dnd_testDB.actorData);"
 			+"END;"
 	}
 
@@ -223,16 +243,16 @@ function confirmActor(actorNum) {
 		+"UPDATE dnd_testDB.temporary_table SET notes = NULL;"
 
 		+"UPDATE dnd_testDB.temporary_table tmp "
-		    +"LEFT OUTER JOIN dnd_testDB."+radioSel+"Data table2 "
-		    +"ON tmp.class = table2.actorName "
-		    +"SET tmp.speed = table2.speed, "
-		    	+"tmp.armorClass = table2.armorClass, "
-		    	+"tmp.currentHitPoints = table2.maxHitPoints, "
-		    	+"tmp.maxHitPoints = table2.maxHitPoints "
-		    	if (radioSel == "player") {
-		    		queryString +=", tmp.notes = table2.notes, "
-		    					+"tmp.conditions = table2.conditions "
-		    	}
+			+"LEFT OUTER JOIN dnd_testDB."+radioSel+"Data table2 "
+			+"ON tmp.class = table2.actorName "
+			+"SET tmp.speed = table2.speed, "
+				+"tmp.armorClass = table2.armorClass, "
+				+"tmp.currentHitPoints = table2.maxHitPoints, "
+				+"tmp.maxHitPoints = table2.maxHitPoints "
+				if (radioSel == "player") {
+					queryString +=", tmp.notes = table2.notes, "
+								+"tmp.conditions = table2.conditions "
+				}
 		   queryString += "WHERE table2.actorName = tmp.class;"
 
 		+"INSERT INTO dnd_testDB.actorData SELECT * FROM dnd_testDB.temporary_table;"
@@ -248,6 +268,7 @@ function confirmActor(actorNum) {
 			returnArgs: {actorNum,radioSel},
 		}
 	queryDatabase(sendData)
+
 
 
 }
@@ -538,15 +559,19 @@ function displayActorName(actorData, returnArgs) {
 	console.log(actorData)
 		console.log(returnArgs)
 	var actorToClear = document.getElementById(returnArgs.actorNum+"idNum")
-	
 	clearDIV(actorToClear)
 
 	var displayRow = document.createElement("tr")
+	var displayTD = document.createElement("td")
+	var displayTable = document.createElement("table")
+	var displayTableTR = document.createElement("tr")
+	displayRow.setAttribute("style", "width:100%; font-size:1em")
+
 
 	var currentTurn = document.createElement("td")
 	currentTurn.setAttribute("style", "width:15%; font-size:2em")
 	currentTurn.innerHTML="-->"
-	displayRow.appendChild(currentTurn)
+	displayTableTR.appendChild(currentTurn)
 
 	var actorName = document.createElement("td")
 	actorName.setAttribute("style", "width:65%; font-size:2em; text-align: center")
@@ -554,7 +579,7 @@ function displayActorName(actorData, returnArgs) {
 	actorName.value = actorData[0].actorID	
 	var turnOrderTitleText = document.createTextNode(actorData[0].actorName)
 	actorName.appendChild(turnOrderTitleText)
-	displayRow.appendChild(actorName)
+	displayTableTR.appendChild(actorName)
 
 	var actorInspectTD = document.createElement("td")
 	var actorInspectBtn = document.createElement("button")
@@ -564,11 +589,16 @@ function displayActorName(actorData, returnArgs) {
 	actorInspectBtn.innerHTML="Inspect"
 
 	actorInspectTD.appendChild(actorInspectBtn)
-	displayRow.appendChild(actorInspectTD)
+	// displayTableTR.appendChild(actorInspectTD)
 
+	displayTableTR.appendChild(actorInspectTD)
 
+	displayTable.appendChild(displayTableTR)
+	displayTD.appendChild(displayTable)
+	
+	actorToClear.appendChild(displayTD)
+	actorTableDrag()
 
-	actorToClear.appendChild(displayRow)
 }
 
 
@@ -597,7 +627,7 @@ function displayInspectActor(actorData, actorNum){
 function querySavedTurnOrders() {
 	// Get saved turn orders from DB
 	var sendData={
-		queryString: "SELECT * FROM dnd_testDB.turnorderData",
+		queryString: "SELECT * FROM dnd_testDB.turnorderData ORDER BY turnorderID DESC",
 		returnFunction: displaySavedTurnOrders,
 		returnArgs: 0,
 	}

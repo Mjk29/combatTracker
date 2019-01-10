@@ -1,0 +1,41 @@
+body {
+  font-family: arial, sans-serif;
+  font-size: 14px;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #dddddd;
+}
+
+.even {
+  background-color: #ecf6fc;
+}
+
+.odd {
+  background-color: #ddeedd;
+}
+
+.myDragClass {
+  background-color: yellow;
+  font-size: 16pt;
+}
+.nodrag {
+  background-color: lightblue;
+}
+
+.nodrop {
+  background-color: red;
+}
