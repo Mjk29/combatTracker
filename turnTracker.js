@@ -19,7 +19,7 @@ function displayStartMenu() {
 	startMenuDiv.appendChild(startMenuLabelLoad)
 }
 
-function displayNewTurnOrders() {
+function displayNewTurnOrders(newFlag) {
 	var startMenuDiv = document.getElementById("startMenuDiv")
 	clearDIV(startMenuDiv)
 
@@ -46,7 +46,10 @@ function displayNewTurnOrders() {
 	startMenuDiv.appendChild(lastTurnBtn)
 	startMenuDiv.appendChild(nextTurnBtn)
 	
-	createNewTurnOrder()
+	if (newFlag == true) {
+		createNewTurnOrder()
+	}
+	
 }
 
 function createNewTurnOrder() {
@@ -73,6 +76,32 @@ function setupTurnOrderID(returnData, arg) {
 	currentTurnorderID = returnData[0].turnorderID
 	console.log("SETTING UP TURN ORDER ID"+currentTurnorderID)
 }
+
+
+function updateTurnOrder(){
+	var tableOrder = []
+	var tableOrderTable = document.getElementById('startMenuTable').childNodes
+	for (var i = 0; i < tableOrderTable.length; i++) {
+		console.log(tableOrderTable[i].attributes.actorid.value)
+		tableOrder.push(tableOrderTable[i].attributes.actorid.value)
+	}
+	console.log(tableOrder)
+	var tableOrderJSON = JSON.stringify(tableOrder)
+
+	var queryString = "UPDATE dnd_testDB.turnorderData "
+		+"SET actorData='"+tableOrderJSON+"', roundCount=NULL, `timestamp`='2019-01-09 22:22:08.000' "
+		+"WHERE turnorderID="+currentTurnorderID+"; "
+
+	var sendData={
+		queryString : queryString,
+		returnFunction: null,
+		returnArgs: null,
+	}
+	queryDatabase(sendData)
+
+}
+
+
 
 function actorTableDrag(){
 	$("#startMenuTable").find("table:even").addClass("even");
@@ -472,7 +501,6 @@ function createInspectElements(actorData, returnArgs) {
 	inventoryRow.appendChild(inventoryTitle)
 	inventoryRow.appendChild(inventoryData)
 
-
 	var inspectUpdateBtnRow = document.createElement("tr")
 	var inspectUpdateBtnTD = document.createElement("td")
 	inspectUpdateBtnTD.setAttribute("style","width:100%; text-align:center")
@@ -517,8 +545,6 @@ function updateActorDB(actorNum, actorDB) {
 	+"AND turnorderID='"+currentTurnorderID+"';"
 	+"END;"
 
-
-
 	console.log(queryString)
 
 	var returnArgs = {actorNum:actorNum, radioSel:actorDB}
@@ -557,15 +583,23 @@ function displayActorName(actorData, returnArgs) {
 	displayArgs = returnArgs
 	console.log("DISPLAYACTORNAME")
 	console.log(actorData)
-		console.log(returnArgs)
+	console.log(returnArgs)
 	var actorToClear = document.getElementById(returnArgs.actorNum+"idNum")
 	clearDIV(actorToClear)
 
-	var displayRow = document.createElement("tr")
+	// var displayRow = document.createElement("tr")
+
+	var displayRowActorID = document.createAttribute("actorID")
+	displayRowActorID.value = actorData[0].actorID
+	actorToClear.setAttributeNode(displayRowActorID)
+
+
 	var displayTD = document.createElement("td")
 	var displayTable = document.createElement("table")
 	var displayTableTR = document.createElement("tr")
-	displayRow.setAttribute("style", "width:100%; font-size:1em")
+	// displayRow.setAttribute("style", "width:100%; font-size:1em")
+
+
 
 
 	var currentTurn = document.createElement("td")
@@ -598,7 +632,6 @@ function displayActorName(actorData, returnArgs) {
 	
 	actorToClear.appendChild(displayTD)
 	actorTableDrag()
-
 }
 
 
@@ -612,16 +645,6 @@ function inspectActor(actorID, actorDB, actorNum){
 	}
 	queryDatabase(sendData)
 }
-
-function displayInspectActor(actorData, actorNum){
-	console.log(actorData)
-
-}
-
-
-
-
-
 
 
 function querySavedTurnOrders() {
@@ -656,20 +679,68 @@ function displaySavedTurnOrders(returnedData,arg2) {
 }
 
 
-function selectTurnOrder(turnorderID) {
-	selectedTurnOrder = turnorderDataList.find(x => x.turnorderID === String(turnorderID))
-	var startMenuDiv = document.getElementById("startMenuDiv")
-	clearDIV(startMenuDiv)
+function getTurnorderData(){
+	var turnOrderTable = document.getElementById("startMenuTable").children
+
+	for (node in turnOrderTable){
+        console.log(node)
+    }
+
+	// document.getElementById("startMenuTable").children[0].attributes.actorid.value
 }
 
-function generateSampleJson() {
-	element = []
-	element.push({id:"Secus",db:"playerData"})
-	element.push({id:"Buffalo",db:"playerData"})
-	element.push({id:"Wilton",db:"actorData"})
-	element.push({id:"tarrasque",db:"monsterData"})
 
-	jsoned = JSON.stringify(element)
+
+
+
+function selectTurnOrder(turnorderID) {
+	var selectedTurnOrder = turnorderDataList.find(x => x.turnorderID === String(turnorderID))
+	var startMenuDiv = document.getElementById("startMenuDiv")
+	clearDIV(startMenuDiv)
+	var sendData={
+		queryString: "SELECT * FROM dnd_testDB.turnorderData WHERE turnorderID="+turnorderID+";",
+		returnFunction: fetchActorDataFromLoadTurnOrder,
+		returnArgs: null
+		}
+	queryDatabase(sendData)
+}
+
+function fetchActorDataFromLoadTurnOrder(turnOrderData, returnArgs) {
+	actorIDList = JSON.parse(turnOrderData[0].actorData)
+	console.log(turnOrderData)
+	console.log(actorIDList)
+
+	currentTurnorderID = turnOrderData[0].turnorderID
+	displayNewTurnOrders(false)
+
+	var turnOrderList = document.getElementById("turnOrderList")
+	var turnOrderTable = document.createElement("table")
+		turnOrderTable.setAttribute("style","width:100%; border:1px solid black; table-layout: fixed;")
+		turnOrderTable.setAttribute("border", "1")
+		turnOrderTable.setAttribute("id", "startMenuTable")
+		turnOrderList.appendChild(turnOrderTable)
+
+
+	for (var i = 0; i < actorIDList.length; i++) {
+		console.log(actorIDList[i])
+
+		var sendData={
+			queryString: "SELECT * FROM dnd_testDB.actorData WHERE actorID="+actorIDList[i]+";",
+			returnFunction: displayActorName,
+			returnArgs: { actorNum: i, radioSel: "actor" }
+		}
+		queryDatabase(sendData)
+
+		let newActor = document.createElement("tr")
+		newActor.setAttribute("id",i+"idNum")
+		turnOrderTable.appendChild(newActor)
+		actorCount +=1
+
+
+
+	}
+
+
 }
 
 

@@ -21,11 +21,11 @@ th {
 }
 
 .even {
-  background-color: #ecf6fc;
+  background-color: #ecfcee;
 }
 
 .odd {
-  background-color: #ddeedd;
+  background-color: #fcf7ec;
 }
 
 .myDragClass {
